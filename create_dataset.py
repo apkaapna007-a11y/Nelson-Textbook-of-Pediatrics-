@@ -168,11 +168,11 @@ def create_dataset():
             dataset.append(entry)
             entry_id += 1
             
-            # Limit to reasonable number of entries
-            if len(dataset) >= 50:
+            # Process more entries from each file
+            if len(dataset) >= 200:
                 break
         
-        if len(dataset) >= 50:
+        if len(dataset) >= 600:
             break
     
     # Write to CSV
@@ -189,4 +189,3 @@ def create_dataset():
 
 if __name__ == "__main__":
     create_dataset()
-

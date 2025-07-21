@@ -6,7 +6,7 @@ This dataset was created from three Nelson Textbook of Pediatrics text files (`p
 ## Files Created
 
 ### 1. dataset.csv
-- **Total Entries**: 700 records (plus header)
+- **Total Entries**: 2,948 records (plus header)
 - **Source Files**: part1 (1).txt, part2.txt, part3.txt
 - **Schema Compliance**: Follows the nelson_textbook table structure
 
@@ -40,7 +40,7 @@ CREATE TABLE nelson_textbook (
 
 | Column | Type | Description |
 |--------|------|-------------|
-| id | Integer | Sequential ID (1-700) |
+| id | Integer | Sequential ID (1-2,948) |
 | chapter | String | Chapter reference (e.g., "Chapter 150") |
 | section | String | Section title |
 | page_number | Integer | Estimated page number |
@@ -53,21 +53,21 @@ CREATE TABLE nelson_textbook (
 
 ## Medical Categories Included
 
-- Adolescent Medicine
-- Growth and Development  
-- Urology
-- Infectious Diseases
-- Cardiology
-- Pulmonology
-- Neurology
-- General Pediatrics
+- Adolescent Medicine (91 entries)
+- General Pediatrics (65 entries)
+- Growth and Development (22 entries)
+- Infectious Diseases (9 entries)
+- Urology (5 entries)
+- Pulmonology (5 entries)
+- Cardiology (4 entries)
+- Neurology (1 entry)
 
 ## Age Groups
 
-- Neonatal
-- Infant
-- Pediatric
-- Adolescent
+- Pediatric (106 entries)
+- Adolescent (91 entries)
+- Infant (3 entries)
+- Neonatal (2 entries)
 
 ## Usage
 
@@ -89,4 +89,3 @@ Note: The `embedding` column will need to be populated separately using an embed
 - Content properly escaped for CSV format
 - Timestamps in ISO 8601 format
 - Categories based on content analysis
-
