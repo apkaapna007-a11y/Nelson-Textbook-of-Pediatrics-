@@ -2,6 +2,18 @@
 
 This repository contains a structured dataset prepared from the Nelson Textbook of Pediatrics, designed for use with PostgreSQL and pgvector for AI-powered pediatric medical assistance systems.
 
+## 🚀 NEW: Prisma Database Integration
+
+**Quick Start with Prisma:**
+```bash
+npm install
+npm run db:setup
+npm run db:seed
+npm run db:studio
+```
+
+📖 **[Complete Prisma Setup Guide](PRISMA_SETUP.md)** - Full documentation for database setup, queries, and usage examples.
+
 ## 📊 Dataset Overview
 
 The dataset includes:
@@ -225,4 +237,3 @@ For questions or issues with this dataset, please create an issue in the reposit
 ---
 
 **Generated from Nelson Textbook of Pediatrics content for AI-powered pediatric medical assistance systems.**
-
