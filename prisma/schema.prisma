@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model NelsonContent {
+  id              Int      @id @default(autoincrement())
+  chapter         String?  @db.VarChar(255)
+  section         String?  @db.Text
+  pageNumber      Int?     @map("page_number")
+  content         String   @db.Text
+  keywords        String?  @db.Text
+  medicalCategory String?  @map("medical_category") @db.VarChar(100)
+  ageGroup        String?  @map("age_group") @db.VarChar(50)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Indexes for better query performance
+  @@index([medicalCategory])
+  @@index([ageGroup])
+  @@index([chapter])
+  @@index([keywords])
+  @@map("nelson_content")
+}
+
+// Optional: Create separate models for better normalization
+model MedicalCategory {
+  id          Int    @id @default(autoincrement())
+  name        String @unique @db.VarChar(100)
+  description String? @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("medical_categories")
+}
+
+model AgeGroup {
+  id          Int    @id @default(autoincrement())
+  name        String @unique @db.VarChar(50)
+  description String? @db.Text
+  minAge      Int?   @map("min_age")
+  maxAge      Int?   @map("max_age")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("age_groups")
+}
+
