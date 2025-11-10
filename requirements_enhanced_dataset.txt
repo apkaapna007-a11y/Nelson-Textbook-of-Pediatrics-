@@ -1,0 +1,51 @@
+# Requirements for Enhanced Nelson Dataset Generation Script
+# Install with: pip install -r requirements_enhanced_dataset.txt
+
+# Core dependencies
+tiktoken>=0.5.0              # Accurate token counting using OpenAI's encoding
+numpy>=1.21.0               # Numerical computing
+pandas>=1.3.0               # Data manipulation
+tqdm>=4.50.0                # Progress bars
+
+# AI/ML dependencies (optional but recommended for full functionality)
+torch>=1.9.0                # PyTorch - required for embeddings and summarization
+sentence-transformers>=2.0.0 # Semantic embeddings (all-MiniLM-L6-v2 model)
+transformers>=4.0.0         # Hugging Face transformers for summarization (BART)
+
+# Database
+# Note: psycopg2 is optional, only needed if directly connecting to PostgreSQL from script
+# psycopg2-binary>=2.9.0
+
+# Development/Testing (optional)
+pytest>=6.0.0               # Testing framework
+black>=21.0                 # Code formatting
+flake8>=3.9.0              # Linting
+
+# Notes:
+# - tiktoken: Needed for accurate token counting. Without it, uses word-count fallback.
+# - torch: Large package (~2GB). Required for embeddings/summarization. Can skip with --skip-ai flag.
+# - sentence-transformers: Downloads model on first use (~500MB). Required for embeddings.
+# - transformers: Needed for BART summarization. Required for AI summarization features.
+
+# GPU Support (CUDA 11.8)
+# Uncomment if you have NVIDIA GPU:
+# torch-cuda>=11.8
+
+# For Apple Silicon (M1/M2/M3):
+# Replace torch with: pip install torch --index-url https://download.pytorch.org/whl/nightly/cpu
+
+# Installation instructions:
+
+# Minimal installation (fallback methods only):
+# pip install tiktoken numpy pandas tqdm
+
+# Full installation (with AI models):
+# pip install -r requirements_enhanced_dataset.txt
+
+# GPU support (NVIDIA CUDA 11.8+):
+# pip install -r requirements_enhanced_dataset.txt
+# # Then verify: python3 -c "import torch; print(torch.cuda.is_available())"
+
+# Development setup:
+# pip install -r requirements_enhanced_dataset.txt pytest black flake8
+# pre-commit install  # if using pre-commit hooks
