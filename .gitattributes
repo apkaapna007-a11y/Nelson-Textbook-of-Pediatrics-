@@ -1,3 +1,0 @@
-enhanced_*.csv filter=lfs diff=lfs merge=lfs -text
-enhanced_*.json filter=lfs diff=lfs merge=lfs -text
-enhanced_*.sql filter=lfs diff=lfs merge=lfs -text
