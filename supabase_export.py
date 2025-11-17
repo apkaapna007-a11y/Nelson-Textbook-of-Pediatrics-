@@ -26,9 +26,10 @@ import json
 import sys
 from pathlib import Path
 
+# Prefer the unoptimized dataset first to preserve exact text formatting.
 SOURCE_PRIORITY = [
-    "nelson_textbook_perfect_optimized.csv",
     "nelson_textbook_perfect.csv",
+    "nelson_textbook_perfect_optimized.csv",
 ]
 
 CSV_OUTPUT = "nelson_supabase.csv"
@@ -55,20 +56,16 @@ def find_source_csv() -> Path:
                             + ", ".join(SOURCE_PRIORITY))
 
 def normalize_row(src: dict) -> dict:
-    # Preserve exact medical text
-    text = (src.get("text", "") or "").strip()
+    # Preserve exact medical text with zero alterations
+    text = src.get("text", "") or ""
 
-    # Prefer page_start; if empty, fall back to page_end
+    # Prefer page_start; if empty, fall back to page_end (no inference beyond selecting an existing value)
     page_start = (src.get("page_start", "") or "").strip()
     page_end = (src.get("page_end", "") or "").strip()
     page_number = page_start if page_start else page_end
 
-    # Map block_type directly, but ensure only allowed values
-    allowed_types = {"paragraph", "bullet", "heading", "table", "figure_caption"}
+    # Keep block_type as-is; do not infer defaults
     block_type = (src.get("block_type", "") or "").strip()
-    if block_type not in allowed_types:
-        # Do not infer; keep as-is if present, else default to paragraph
-        block_type = block_type if block_type else "paragraph"
 
     out = {
         "book_title": (src.get("book_title", "") or "").strip() or "Nelson Textbook of Pediatrics",
@@ -84,13 +81,15 @@ def normalize_row(src: dict) -> dict:
     return out
 
 def validate_row(row: dict, idx: int):
-    # Minimal validation per user requirements
+    # Validation per requirements
     if not row["chapter_number"]:
         raise ValueError(f"Row {idx}: missing chapter_number")
     if not row["block_type"]:
         raise ValueError(f"Row {idx}: missing block_type")
-    if not row["block_text"]:
-        raise ValueError(f"Row {idx}: empty block_text")
+    if row["block_type"] not in {"paragraph", "bullet", "heading", "table", "figure_caption"}:
+        raise ValueError(f"Row {idx}: invalid block_type '{row['block_type']}'")
+    if row["block_text"] is None:
+        raise ValueError(f"Row {idx}: block_text is None")
 
 def export():
     src_path = find_source_csv()
