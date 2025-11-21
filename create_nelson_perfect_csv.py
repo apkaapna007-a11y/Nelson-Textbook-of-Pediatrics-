@@ -3,6 +3,10 @@
 Nelson Textbook of Pediatrics - Perfect CSV Dataset Generator
 Creates 100% complete, accurate CSV dataset for RAG pipeline.
 No null/empty fields, no hallucinations, preserves all medical text verbatim.
+
+Updated:
+- Emits heading blocks for chapter titles, section headers, and subsection headers.
+- Keeps exact text for headings using the original line content.
 """
 
 import re
@@ -61,7 +65,8 @@ class NelsonTextbookParser:
         
         i = 0
         while i < len(lines):
-            line = lines[i].strip()
+            raw_line = lines[i]
+            line = raw_line.strip()
             
             # Skip empty lines
             if not line:
@@ -77,7 +82,22 @@ class NelsonTextbookParser:
                 current_section_num = ""
                 current_subsection = ""
                 current_subsection_num = ""
-                block_counter = 1
+                # Emit chapter heading block (using parsed title to avoid including "Chapter X")
+                if current_chapter:
+                    blocks.append({
+                        'chapter_number': current_chapter_num,
+                        'chapter_title': current_chapter,
+                        'section_number': "",
+                        'section_title': "",
+                        'subsection_number': "",
+                        'subsection_title': "",
+                        'block_number': block_counter,
+                        'block_type': 'heading',
+                        'page_start': current_page,
+                        'page_end': current_page,
+                        'text': current_chapter
+                    })
+                    block_counter += 1
                 i += chapter_info['lines_consumed']
                 continue
                 
@@ -88,7 +108,21 @@ class NelsonTextbookParser:
                 current_section_num = section_info['number']
                 current_subsection = ""
                 current_subsection_num = ""
-                block_counter = 1
+                # Emit section heading with exact original text
+                blocks.append({
+                    'chapter_number': current_chapter_num,
+                    'chapter_title': current_chapter,
+                    'section_number': current_section_num,
+                    'section_title': current_section,
+                    'subsection_number': "",
+                    'subsection_title': "",
+                    'block_number': block_counter,
+                    'block_type': 'heading',
+                    'page_start': current_page,
+                    'page_end': current_page,
+                    'text': raw_line.rstrip("\n")
+                })
+                block_counter += 1
                 i += 1
                 continue
                 
@@ -97,7 +131,21 @@ class NelsonTextbookParser:
                 subsection_info = self.parse_subsection_header(line)
                 current_subsection = subsection_info['title']
                 current_subsection_num = subsection_info['number']
-                block_counter = 1
+                # Emit subsection heading with exact original text
+                blocks.append({
+                    'chapter_number': current_chapter_num,
+                    'chapter_title': current_chapter,
+                    'section_number': current_section_num,
+                    'section_title': current_section,
+                    'subsection_number': current_subsection_num,
+                    'subsection_title': current_subsection,
+                    'block_number': block_counter,
+                    'block_type': 'heading',
+                    'page_start': current_page,
+                    'page_end': current_page,
+                    'text': raw_line.rstrip("\n")
+                })
+                block_counter += 1
                 i += 1
                 continue
                 
@@ -220,7 +268,7 @@ class NelsonTextbookParser:
         for line in lines:
             if re.match(r'Chapter\s+\d+', line.strip()):
                 break
-            if line.strip() and not re.match(r'^PART\s+[IVX]+$', line.strip()):
+            if line.strip() and not re.match(r'^PART\s+[IVX]+, line.strip()):
                 title_parts.append(line.strip())
                 
         title = ' '.join(title_parts).strip()
@@ -246,7 +294,7 @@ class NelsonTextbookParser:
             return False
             
         # All caps sections
-        if line.isupper() and not re.match(r'^[IVX]+$', line):
+        if line.isupper() and not re.match(r'^[IVX]+, line):
             return True
             
         # Numbered sections
@@ -414,7 +462,7 @@ class NelsonTextbookParser:
     def is_header_or_special(self, line: str) -> bool:
         """Check if line is a header or special element."""
         special_patterns = [
-            r'^PART\s+[IVX]+$',
+            r'^PART\s+[IVX]+,
             r'^Chapter\s+\d+',
             r'^Fig\.\s*\d+',
             r'^Table\s+\d+',
@@ -519,12 +567,11 @@ def main():
     """Main execution function."""
     parser = NelsonTextbookParser()
     
-    # File paths
-    base_path = "/tmp/apkaapna007-a11y/Nelson-Textbook-of-Pediatrics-"
-    part1_file = f"{base_path}/part1.txt"
-    part2_file = f"{base_path}/part2.txt"
-    part3_file = f"{base_path}/part3.txt"
-    output_file = f"{base_path}/nelson_textbook_perfect.csv"
+    # File paths (use repository-local paths by default)
+    part1_file = "part1.txt"
+    part2_file = "part2.txt"
+    part3_file = "part3.txt"
+    output_file = "nelson_textbook_perfect.csv"
     
     # Generate perfect CSV
     parser.generate_csv(output_file, part1_file, part2_file, part3_file)
