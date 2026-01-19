@@ -42,24 +42,50 @@ def parse_headings(text):
         line_offset = offset
         offset += len(line)
 
+        # Skip suspected headers/footers
+        if "Downloaded for" in stripped or "Copyright ©" in stripped or stripped.startswith("\x0c"):
+            i += 1
+            continue
+        if stripped.isdigit() and len(stripped) < 5: # Page numbers
+            i += 1
+            continue
+
         # Level 1: PART
         if re_part.match(stripped):
             title = stripped
             j = i + 1
-            while j < len(lines) and not lines[j].strip(): j += 1
-            if j < len(lines) and len(lines[j].strip()) < 100 and \
-               not re_part.match(lines[j].strip()) and not re_chapter.match(lines[j].strip()):
-                title += " " + lines[j].strip()
+            while j < len(lines):
+                next_stripped = lines[j].strip()
+                if not next_stripped:
+                    j += 1
+                    continue
+                if next_stripped.isdigit() or "Downloaded for" in next_stripped or next_stripped.startswith("\x0c"):
+                    j += 1
+                    continue
+                if len(next_stripped) < 100 and not re_part.match(next_stripped) and not re_chapter.match(next_stripped):
+                    title += " " + next_stripped
+                break
             candidates.append({'level': 1, 'title': title, 'start_offset': line_offset})
 
         # Level 2: Chapter
         elif re_chapter.match(stripped):
+            # Avoid Chapter headers like "Chapter 20 u Positive Parenting"
+            if " u " in stripped or " \u00ad " in stripped:
+                i += 1
+                continue
             title = stripped
             j = i + 1
-            while j < len(lines) and not lines[j].strip(): j += 1
-            if j < len(lines) and len(lines[j].strip()) < 100 and \
-               not re_chapter.match(lines[j].strip()) and not re_numbered.match(lines[j].strip()):
-                title += ": " + lines[j].strip()
+            while j < len(lines):
+                next_stripped = lines[j].strip()
+                if not next_stripped:
+                    j += 1
+                    continue
+                if next_stripped.isdigit() or "Downloaded for" in next_stripped or next_stripped.startswith("\x0c"):
+                    j += 1
+                    continue
+                if len(next_stripped) < 100 and not re_chapter.match(next_stripped) and not re_numbered.match(next_stripped):
+                    title += ": " + next_stripped
+                break
             candidates.append({'level': 2, 'title': title, 'start_offset': line_offset})
 
         # Level 3: Numbered
@@ -215,11 +241,22 @@ def chunk_sections(text, toc):
         blocks = []
         raw_lines = section_text.splitlines(keepends=True)
         curr_block = ""
-        for line in raw_lines:
+        re_atomic_start = re.compile(r'^(Table\s+\d+|--|•|\*|Step\s+\d+)', re.I)
+        re_dosage = re.compile(r'\d+(?:\.\d+)?\s*(?:mg|g|mcg|mL|L|kg|unit|mmol|mEq)/', re.I)
+
+        blocks = []
+        curr_block = ""
+        i_l = 0
+        while i_l < len(raw_lines):
+            line = raw_lines[i_l]
             curr_block += line
-            if not line.strip(): # Blank line marks end of block
-                blocks.append(curr_block)
-                curr_block = ""
+            if not line.strip():
+                # Check if next line continues a list/table
+                next_line = raw_lines[i_l+1].strip() if i_l+1 < len(raw_lines) else ""
+                if not (re_atomic_start.match(next_line) or re_dosage.search(next_line)):
+                    blocks.append(curr_block)
+                    curr_block = ""
+            i_l += 1
         if curr_block:
             blocks.append(curr_block)
 

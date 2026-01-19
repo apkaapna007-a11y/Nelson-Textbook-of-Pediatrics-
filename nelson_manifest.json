@@ -1,12 +1,12 @@
 {
   "total_chars": 12983016,
   "total_chunks": 3723,
-  "avg_token_estimate": 409.88477034649475,
+  "avg_token_estimate": 409.9186140209508,
   "min_chunk_size": 1,
   "max_chunk_size": 1435,
   "counts_per_chapter": {
     "Chapter 19: Developmental and": 13,
-    "Chapter 20: 4": 8,
+    "Chapter 20: Age (yr)": 8,
     "Chapter 21: Assessment of Fetal": 6,
     "Chapter 22: 7.5": 8,
     "Chapter 23: The First Year": 6,
@@ -253,7 +253,7 @@
     "Chapter 469: Cardiac Development": 6,
     "Chapter 470: The Fetal to Neonatal": 4,
     "Chapter 471: History and Physical": 21,
-    "Chapter 472: 20": 19,
+    "Chapter 472: Pulmonic": 19,
     "Chapter 473: Epidemiology and Genetic": 26,
     "Chapter 474: Congenital heart disease": 4,
     "Chapter 475: Acyanotic Congenital": 21,
